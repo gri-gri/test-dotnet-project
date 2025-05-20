@@ -96,6 +96,27 @@ public class User
     public DateTime? RevokedOn { get; private set; } = default;
     public string? RevokedBy { get; private set; } = default;
 
+    public void ChangeName(string name, string modifierLogin)
+    {
+        Name = name;
+
+        MarkModified(modifierLogin);
+    }
+
+    public void ChangeGender(int gender, string modifierLogin)
+    {
+        Gender = gender;
+
+        MarkModified(modifierLogin);
+    }
+
+    public void ChangeBirthday(DateTime? birthday, string modifierLogin)
+    {
+        Birthday = birthday;
+
+        MarkModified(modifierLogin);
+    }
+
     public void Revoke(string revokerLogin)
     {
         RevokedOn = DateTime.UtcNow;
@@ -104,10 +125,12 @@ public class User
         MarkModified(revokerLogin);
     }
 
-    public void Revive()
+    public void Revive(string reviverLogin)
     {
         RevokedOn = default;
         RevokedBy = default;
+
+        MarkModified(reviverLogin);
     }
 
     private void MarkModified(string modifierLogin)

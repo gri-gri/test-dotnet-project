@@ -18,7 +18,7 @@ public class UsersRepository
 
         if (existingUserWithSameLogin is not null)
         {
-            throw new LoginIsNotUniqueRepositoryException("Login is not unique", dto.Login);
+            throw LoginIsNotUniqueRepositoryException.FromLogin(dto.Login);
         }
 
         var user = new User(dto.Login, dto.Password, dto.Name, dto.Gender, dto.Birthday, dto.IsAdmin, dto.CreatorLogin);
@@ -28,6 +28,18 @@ public class UsersRepository
         await usersDbContext.SaveChangesAsync();
 
         return user.Guid;
+    }
+
+    public async Task ChangeInfoAsync(Guid guid, string name, int gender, DateTime? birthday, string modifierLogin)
+    {
+        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Guid == guid)
+            ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
+
+        user.ChangeName(name, modifierLogin);
+        user.ChangeGender(gender, modifierLogin);
+        user.ChangeBirthday(birthday, modifierLogin);
+
+        await usersDbContext.SaveChangesAsync();
     }
 
     public async Task<List<User>> GetActiveAsync()
@@ -61,7 +73,7 @@ public class UsersRepository
     public async Task DeleteAsync(string login)
     {
         var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login)
-            ?? throw new UserNotFoundException("User was not found", login);
+            ?? throw UserNotFoundException.FromAnyStringId(login);
 
         usersDbContext.Users.Remove(user);
 
@@ -71,19 +83,19 @@ public class UsersRepository
     public async Task RevokeAsync(string login, string revokerLogin)
     {
         var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login)
-            ?? throw new UserNotFoundException("User was not found", login);
+            ?? throw UserNotFoundException.FromAnyStringId(login);
 
         user.Revoke(revokerLogin);
 
         await usersDbContext.SaveChangesAsync();
     }
 
-    public async Task ReviveAsync(Guid guid)
+    public async Task ReviveAsync(Guid guid, string reviverLogin)
     {
         var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Guid == guid)
-            ?? throw new UserNotFoundException("User was not found", guid.ToString());
+            ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
 
-        user.Revive();
+        user.Revive(reviverLogin);
 
         await usersDbContext.SaveChangesAsync();
     }

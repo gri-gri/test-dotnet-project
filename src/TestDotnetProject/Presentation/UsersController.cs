@@ -55,6 +55,33 @@ public class UsersController : ControllerBase
         }
     }
 
+    [HttpPut("{guid:guid}/info")]
+    public async Task<ActionResult> ChangeInfoAsync([FromRoute] Guid guid, [FromBody] ChangeInfoRequestDto dto)
+    {
+        if (!dto.Name.ConsistsFromLatinRussianLetters())
+        {
+            return BadRequest(
+                $"Parameter {nameof(dto.Name)} with value '{dto.Name}' " +
+                "does not consist from latin and/or russian letters");
+        }
+
+        if (dto.Gender < 0 || dto.Gender > 2)
+        {
+            return BadRequest($"Parameter {nameof(dto.Gender)} must be 0, 1 or 2, not '{dto.Gender}'");
+        }
+
+        try
+        {
+            await usersRepository.ChangeInfoAsync(guid, dto.Name, dto.Gender, dto.Birthday, "defaultAdmin");
+        }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound($"User with login '{ex.Id}' was not found");
+        }
+
+        return Ok();
+    }
+
     [HttpGet("active")]
     // Here and after returning full user is bad, but anything other is not specified
     public async Task<ActionResult<List<User>>> GetActiveAsync()
@@ -118,29 +145,29 @@ public class UsersController : ControllerBase
         }
         catch (UserNotFoundException ex)
         {
-            return NotFound($"User with login '{ex.Login}' was not found");
+            return NotFound($"User with login '{ex.Id}' was not found");
         }
     }
 
-    [HttpPatch("{guid:guid}")]
+    [HttpPut("{guid:guid}/revoked-status")]
     public async Task<ActionResult> ReviveAsync([FromRoute] Guid guid, [FromBody] ReviveRequestDto dto)
     {
-        if (dto.RevokedOn is not null || dto.RevokedBy is not null)
+        if (dto.RevokedStatus)
         {
             return BadRequest(
-                "Both RevokedOn and RevokedBy for this request must be null, " +
-                "because essentially this is the 'Revive' endpoint");
+                "RevokedStatus for this request must be false, because essentially this is the 'Revive' endpoint. " +
+                "To revoke user call DELETE on user by login");
         }
 
         try
         {
-            await usersRepository.ReviveAsync(guid);
+            await usersRepository.ReviveAsync(guid, "defaultAdmin");
 
             return Ok();
         }
         catch (UserNotFoundException ex)
         {
-            return NotFound($"User with login '{ex.Login}' was not found");
+            return NotFound($"User with login '{ex.Id}' was not found");
         }
 
     }

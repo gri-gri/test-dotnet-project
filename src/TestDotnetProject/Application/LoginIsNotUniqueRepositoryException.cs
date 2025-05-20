@@ -15,4 +15,9 @@ public class LoginIsNotUniqueRepositoryException : Exception
     }
 
     public string? Login { get; }
+
+    public static LoginIsNotUniqueRepositoryException FromLogin(string login)
+    {
+        return new LoginIsNotUniqueRepositoryException("Login is not unique", login);
+    }
 }

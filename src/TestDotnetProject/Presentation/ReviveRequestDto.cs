@@ -1,3 +1,3 @@
 namespace TestDotnetProject.Presentation;
 
-public record class ReviveRequestDto(DateTime? RevokedOn, string? RevokedBy) { }
+public record class ReviveRequestDto(bool RevokedStatus) { }

@@ -9,10 +9,15 @@ public class UserNotFoundException : Exception
     public UserNotFoundException(string message, Exception innerException) : base(message, innerException)
     { }
 
-    public UserNotFoundException(string message, string login) : this(message)
+    public UserNotFoundException(string message, string id) : this(message)
     {
-        Login = login;
+        Id = id;
     }
 
-    public string? Login { get; }
+    public string? Id { get; }
+
+    public static UserNotFoundException FromAnyStringId(string id)
+    {
+        return new UserNotFoundException("User was not found", id);
+    }
 }

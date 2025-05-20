@@ -7,14 +7,13 @@ public class User
     private string name;
     private int gender;
 
-    private User() {} // Used by EF Core
-    
+    private User() { } // Used by EF Core
+
     public User(
         string login, string password, string name, int gender, DateTime? birthday, bool isAdmin, string creatorLogin)
     {
         Guid = Guid.NewGuid();
         CreatedOn = DateTime.UtcNow;
-        ModifiedOn = DateTime.UtcNow;
 
         Login = login;
         Password = password;
@@ -23,7 +22,8 @@ public class User
         Birthday = birthday;
         Admin = isAdmin;
         CreatedBy = creatorLogin;
-        ModifiedBy = creatorLogin;
+
+        MarkModified(creatorLogin);
     }
 
     public Guid Guid { get; private set; }
@@ -95,4 +95,18 @@ public class User
     public string ModifiedBy { get; private set; }
     public DateTime? RevokedOn { get; private set; } = default;
     public string? RevokedBy { get; private set; } = default;
+
+    public void Revoke(string revokerLogin)
+    {
+        RevokedOn = DateTime.UtcNow;
+        RevokedBy = revokerLogin;
+
+        MarkModified(revokerLogin);
+    }
+
+    private void MarkModified(string modifierLogin)
+    {
+        ModifiedOn = DateTime.UtcNow;
+        ModifiedBy = modifierLogin;
+    }
 }

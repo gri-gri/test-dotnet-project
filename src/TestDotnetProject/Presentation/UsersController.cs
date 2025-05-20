@@ -76,7 +76,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{login}/password/{password}")] // Very bad decision, but the task is so
-    public async Task<ActionResult<User>> GetByLoginAndPassword([FromRoute] string login, [FromRoute] string password)
+    public async Task<ActionResult<User>> GetByLoginAndPasswordAsync([FromRoute] string login, [FromRoute] string password)
     {
         var user = await usersRepository.GetByLoginAndPasswordAsync(login, password);
 
@@ -89,7 +89,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("seniors")]
-    public async Task<ActionResult<List<User>>> GetSeniors([FromQuery] int olderThanYears)
+    public async Task<ActionResult<List<User>>> GetSeniorsAsync([FromQuery] int olderThanYears)
     {
         if (olderThanYears < 1)
         {
@@ -97,5 +97,27 @@ public class UsersController : ControllerBase
         }
 
         return await usersRepository.GetOlderThanYearsAsync(olderThanYears);
+    }
+
+    [HttpDelete("{login}")]
+    public async Task<ActionResult> DeleteAsync([FromRoute] string login, [FromQuery] bool softDeletion)
+    {
+        try
+        {
+            if (softDeletion)
+            {
+                await usersRepository.RevokeAsync(login, "defaultAdmin");
+            }
+            else
+            {
+                await usersRepository.DeleteAsync(login);
+            }
+
+            return Ok();
+        }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound($"User with login '{ex.Login}' was not found");
+        }
     }
 }

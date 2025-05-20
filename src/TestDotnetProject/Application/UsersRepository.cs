@@ -33,6 +33,7 @@ public class UsersRepository
     public async Task<List<User>> GetActiveAsync()
     {
         return await usersDbContext.Users
+            .AsNoTracking()
             .Where(user => user.RevokedOn == default)
             .OrderBy(user => user.CreatedOn)
             .ToListAsync();
@@ -40,18 +41,38 @@ public class UsersRepository
 
     public async Task<User?> GetByLoginAsync(string login)
     {
-        return await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login);
+        return await usersDbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Login == login);
     }
 
     public async Task<User?> GetByLoginAndPasswordAsync(string login, string password)
     {
-        return await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login && user.Password == password);
+        return await usersDbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Login == login && user.Password == password);
     }
 
     public async Task<List<User>> GetOlderThanYearsAsync(int years)
     {
         var latestBirthdate = DateTime.UtcNow.AddYears(-years);
 
-        return await usersDbContext.Users.Where(user => user.Birthday < latestBirthdate).ToListAsync();
+        return await usersDbContext.Users.AsNoTracking().Where(user => user.Birthday < latestBirthdate).ToListAsync();
+    }
+
+    public async Task DeleteAsync(string login)
+    {
+        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login)
+            ?? throw new UserNotFoundException("User was not found", login);
+
+        usersDbContext.Users.Remove(user);
+
+        await usersDbContext.SaveChangesAsync();
+    }
+
+    public async Task RevokeAsync(string login, string revokerLogin)
+    {
+        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login)
+            ?? throw new UserNotFoundException("User was not found", login);
+
+        user.Revoke(revokerLogin);
+
+        await usersDbContext.SaveChangesAsync();
     }
 }

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TestDotnetProject.Application;
-
+using TestDotnetProject.Domain;
 
 namespace TestDotnetProject.Presentation;
 
@@ -16,10 +16,35 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create()
+    public async Task<ActionResult<Guid>> Create([FromBody] CreateUserRequestDto dto)
     {
-        await usersRepository.CreateAsync();
+        if (!dto.Login.IsAlphaNumeric())
+        {
+            return BadRequest($"Parameter {nameof(dto.Login)} with value '{dto.Login}' is not alphanumeric");
+        }
 
-        return Created();
+        if (!dto.Password.IsAlphaNumeric())
+        {
+            return BadRequest($"Parameter {nameof(dto.Password)} with value '{dto.Password}' is not alphanumeric");
+        }
+
+        if (!dto.Name.ConsistsFromLatinRussianLetters())
+        {
+            return BadRequest(
+                $"Parameter {nameof(dto.Name)} with value '{dto.Name}' " +
+                "does not consist from latin and/or russian letters");
+        }
+
+        if (dto.Gender < 0 || dto.Gender > 2)
+        {
+            return BadRequest($"Parameter {nameof(dto.Gender)} must be 0, 1 or 2, not '{dto.Gender}'");
+        }
+
+        var repositoryDto = new CreateUserDto(
+            dto.Login, dto.Password, dto.Name, dto.Gender, dto.Birthday, dto.IsAdmin, "defaultAdmin");
+
+        var userGuid = await usersRepository.CreateAsync(repositoryDto);
+
+        return userGuid;
     }
 }

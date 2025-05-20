@@ -7,6 +7,8 @@ public class User
     private string name;
     private int gender;
 
+    private User() {} // Used by EF Core
+    
     public User(
         string login, string password, string name, int gender, DateTime? birthday, bool isAdmin, string creatorLogin)
     {

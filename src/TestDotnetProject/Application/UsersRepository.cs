@@ -1,3 +1,5 @@
+using TestDotnetProject.Domain;
+
 namespace TestDotnetProject.Application;
 
 public class UsersRepository
@@ -9,5 +11,14 @@ public class UsersRepository
         this.usersDbContext = usersDbContext;
     }
 
-    public async Task CreateAsync() {}
+    public async Task<Guid> CreateAsync(CreateUserDto dto)
+    {
+        var user = new User(dto.Login, dto.Password, dto.Name, dto.Gender, dto.Birthday, dto.IsAdmin, dto.CreatorLogin);
+
+        usersDbContext.Add(user);
+
+        await usersDbContext.SaveChangesAsync();
+
+        return user.Guid;
+    }
 }

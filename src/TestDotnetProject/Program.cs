@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TestDotnetProject;
+using TestDotnetProject.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 

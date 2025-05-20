@@ -42,4 +42,9 @@ public class UsersRepository
     {
         return await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login);
     }
+
+    public async Task<User?> GetByLoginAndPasswordAsync(string login, string password)
+    {
+        return await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login && user.Password == password);
+    }
 }

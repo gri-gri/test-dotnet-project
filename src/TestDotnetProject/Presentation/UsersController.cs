@@ -56,6 +56,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("active")]
+    // Here and after returning full user is bad, but anything other is not specified
     public async Task<ActionResult<List<User>>> GetActiveAsync()
     {
         return await usersRepository.GetActiveAsync();
@@ -72,5 +73,18 @@ public class UsersController : ControllerBase
         }
 
         return new GetUserBriefResponseDto(user.Name, user.Gender, user.Birthday, user.RevokedOn == default);
+    }
+
+    [HttpGet("{login}/password/{password}")] // Very bad decision, but the task is so
+    public async Task<ActionResult<User>> GetByLoginAndPassword([FromRoute] string login, [FromRoute] string password)
+    {
+        var user = await usersRepository.GetByLoginAndPasswordAsync(login, password);
+
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        return user;
     }
 }

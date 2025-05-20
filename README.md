@@ -1,3 +1,4 @@
 # test-dotnet-project
-Это тестовый проект на .NET 9. WEB API сервис, реализующий API методы CRUD над
-сущностью Users.
+This is a test project on .NET 9. WEB API service, implementing API CRUD methods on Users entity.
+## How to run?
+Run `docker compose up -d`, then navigate to `http://localhost:8080`.

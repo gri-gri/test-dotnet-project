@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDotnetProject", "TestDotnetProject\TestDotnetProject.csproj", "{6FBEBEDB-F52D-4989-A84F-68166E565C94}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9F897800-4278-4482-9E9B-696F3C4E8CAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDotnetProject", "src\TestDotnetProject\TestDotnetProject.csproj", "{CD64BDB1-B65F-4872-8893-A33309BEF23B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +16,12 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6FBEBEDB-F52D-4989-A84F-68166E565C94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6FBEBEDB-F52D-4989-A84F-68166E565C94}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6FBEBEDB-F52D-4989-A84F-68166E565C94}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6FBEBEDB-F52D-4989-A84F-68166E565C94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD64BDB1-B65F-4872-8893-A33309BEF23B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD64BDB1-B65F-4872-8893-A33309BEF23B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD64BDB1-B65F-4872-8893-A33309BEF23B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD64BDB1-B65F-4872-8893-A33309BEF23B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CD64BDB1-B65F-4872-8893-A33309BEF23B} = {9F897800-4278-4482-9E9B-696F3C4E8CAA}
 	EndGlobalSection
 EndGlobal

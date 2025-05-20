@@ -73,6 +73,14 @@ public class UsersRepository
         await usersDbContext.SaveChangesAsync();
     }
 
+    public async Task<User> FindUserAsync(Guid guid)
+    {
+        return await usersDbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Guid == guid)
+            ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
+    }
+
     public async Task<List<User>> GetActiveAsync()
     {
         return await usersDbContext.Users

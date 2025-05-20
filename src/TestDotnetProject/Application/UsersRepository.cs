@@ -78,10 +78,10 @@ public class UsersRepository
         await usersDbContext.SaveChangesAsync();
     }
 
-    public async Task ReviveAsync(string login)
+    public async Task ReviveAsync(Guid guid)
     {
-        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login)
-            ?? throw new UserNotFoundException("User was not found", login);
+        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Guid == guid)
+            ?? throw new UserNotFoundException("User was not found", guid.ToString());
 
         user.Revive();
 

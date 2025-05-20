@@ -122,8 +122,8 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpPatch("{login}")]
-    public async Task<ActionResult> ReviveAsync([FromRoute] string login, [FromBody] ReviveRequestDto dto)
+    [HttpPatch("{guid:guid}")]
+    public async Task<ActionResult> ReviveAsync([FromRoute] Guid guid, [FromBody] ReviveRequestDto dto)
     {
         if (dto.RevokedOn is not null || dto.RevokedBy is not null)
         {
@@ -134,7 +134,7 @@ public class UsersController : ControllerBase
 
         try
         {
-            await usersRepository.ReviveAsync(login);
+            await usersRepository.ReviveAsync(guid);
 
             return Ok();
         }

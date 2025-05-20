@@ -82,6 +82,26 @@ public class UsersController : ControllerBase
         return Ok();
     }
 
+    [HttpPut("{guid:guid}/password")]
+    public async Task<ActionResult> ChangePasswordAsync([FromRoute] Guid guid, [FromBody] ChangePasswordRequestDto dto)
+    {
+        if (!dto.Password.IsAlphaNumeric())
+        {
+            return BadRequest($"Parameter {nameof(dto.Password)} with value '{dto.Password}' is not alphanumeric");
+        }
+
+        try
+        {
+            await usersRepository.ChangePasswordAsync(guid, dto.Password, "defaultAdmin");
+        }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound($"User with login '{ex.Id}' was not found");
+        }
+
+        return Ok();
+    }
+
     [HttpGet("active")]
     // Here and after returning full user is bad, but anything other is not specified
     public async Task<ActionResult<List<User>>> GetActiveAsync()

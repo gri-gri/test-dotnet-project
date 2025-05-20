@@ -96,6 +96,13 @@ public class User
     public DateTime? RevokedOn { get; private set; } = default;
     public string? RevokedBy { get; private set; } = default;
 
+    public void ChangePassword(string password, string modifierLogin)
+    {
+        Password = password;
+
+        MarkModified(modifierLogin);
+    }
+
     public void ChangeName(string name, string modifierLogin)
     {
         Name = name;

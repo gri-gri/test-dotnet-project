@@ -42,6 +42,16 @@ public class UsersRepository
         await usersDbContext.SaveChangesAsync();
     }
 
+    public async Task ChangePasswordAsync(Guid guid, string password, string modifierLogin)
+    {
+        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Guid == guid)
+            ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
+
+        user.ChangePassword(password, modifierLogin);
+
+        await usersDbContext.SaveChangesAsync();
+    }
+
     public async Task<List<User>> GetActiveAsync()
     {
         return await usersDbContext.Users

@@ -46,7 +46,9 @@ public class UsersRepository
 
     public async Task<User?> GetByLoginAndPasswordAsync(string login, string password)
     {
-        return await usersDbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Login == login && user.Password == password);
+        return await usersDbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Login == login && user.Password == password);
     }
 
     public async Task<List<User>> GetOlderThanYearsAsync(int years)
@@ -72,6 +74,16 @@ public class UsersRepository
             ?? throw new UserNotFoundException("User was not found", login);
 
         user.Revoke(revokerLogin);
+
+        await usersDbContext.SaveChangesAsync();
+    }
+
+    public async Task ReviveAsync(string login)
+    {
+        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login)
+            ?? throw new UserNotFoundException("User was not found", login);
+
+        user.Revive();
 
         await usersDbContext.SaveChangesAsync();
     }

@@ -104,6 +104,12 @@ public class User
         MarkModified(revokerLogin);
     }
 
+    public void Revive()
+    {
+        RevokedOn = default;
+        RevokedBy = default;
+    }
+
     private void MarkModified(string modifierLogin)
     {
         ModifiedOn = DateTime.UtcNow;

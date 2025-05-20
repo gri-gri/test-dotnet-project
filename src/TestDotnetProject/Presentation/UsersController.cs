@@ -76,7 +76,8 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{login}/password/{password}")] // Very bad decision, but the task is so
-    public async Task<ActionResult<User>> GetByLoginAndPasswordAsync([FromRoute] string login, [FromRoute] string password)
+    public async Task<ActionResult<User>> GetByLoginAndPasswordAsync(
+        [FromRoute] string login, [FromRoute] string password)
     {
         var user = await usersRepository.GetByLoginAndPasswordAsync(login, password);
 
@@ -119,5 +120,28 @@ public class UsersController : ControllerBase
         {
             return NotFound($"User with login '{ex.Login}' was not found");
         }
+    }
+
+    [HttpPatch("{login}")]
+    public async Task<ActionResult> ReviveAsync([FromRoute] string login, [FromBody] ReviveRequestDto dto)
+    {
+        if (dto.RevokedOn is not null || dto.RevokedBy is not null)
+        {
+            return BadRequest(
+                "Both RevokedOn and RevokedBy for this request must be null, " +
+                "because essentially this is the 'Revive' endpoint");
+        }
+
+        try
+        {
+            await usersRepository.ReviveAsync(login);
+
+            return Ok();
+        }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound($"User with login '{ex.Login}' was not found");
+        }
+
     }
 }

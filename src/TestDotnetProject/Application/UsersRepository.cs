@@ -30,11 +30,16 @@ public class UsersRepository
         return user.Guid;
     }
 
-    public async Task<List<User>> GetActiveUsers()
+    public async Task<List<User>> GetActiveAsync()
     {
         return await usersDbContext.Users
             .Where(user => user.RevokedOn == default)
             .OrderBy(user => user.CreatedOn)
             .ToListAsync();
+    }
+
+    public async Task<User?> GetByLoginAsync(string login)
+    {
+        return await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login);
     }
 }

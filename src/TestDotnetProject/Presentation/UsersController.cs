@@ -16,7 +16,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Guid>> Create([FromBody] CreateUserRequestDto dto)
+    public async Task<ActionResult<Guid>> CreateAsync([FromBody] CreateUserRequestDto dto)
     {
         if (!dto.Login.IsAlphaNumeric())
         {
@@ -56,8 +56,21 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("active")]
-    public async Task<ActionResult<List<User>>> GetActiveUsers()
+    public async Task<ActionResult<List<User>>> GetActiveAsync()
     {
-        return await usersRepository.GetActiveUsers();
+        return await usersRepository.GetActiveAsync();
+    }
+
+    [HttpGet("{login}")]
+    public async Task<ActionResult<GetUserBriefResponseDto>> GetByLoginAsync([FromRoute] string login)
+    {
+        var user = await usersRepository.GetByLoginAsync(login);
+
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        return new GetUserBriefResponseDto(user.Name, user.Gender, user.Birthday, user.RevokedOn == default);
     }
 }

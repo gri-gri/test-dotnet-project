@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using TestDotnetProject.Domain;
 
-namespace TestDotnetProject;
+namespace TestDotnetProject.Application;
 
 public class UsersDbContext : DbContext
 {

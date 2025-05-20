@@ -1,4 +1,4 @@
-namespace TestDotnetProject;
+namespace TestDotnetProject.Application;
 
 public class UsersRepository
 {

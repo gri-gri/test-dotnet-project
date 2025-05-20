@@ -13,5 +13,8 @@ public class UsersDbContext : DbContext
     {
         modelBuilder.Entity<User>()
             .HasKey(user => user.Guid);
+
+        modelBuilder.Entity<User>()
+            .HasAlternateKey(user => user.Login);
     }
 }

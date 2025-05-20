@@ -26,7 +26,7 @@ public class User
         ModifiedBy = creatorLogin;
     }
 
-    public Guid Guid { get; }
+    public Guid Guid { get; private set; }
 
     public string Login
     {
@@ -87,12 +87,12 @@ public class User
     }
 
 
-    public DateTime? Birthday { get; }
-    public bool Admin { get; }
-    public DateTime CreatedOn { get; }
-    public string CreatedBy { get; }
-    public DateTime ModifiedOn { get; }
-    public string ModifiedBy { get; }
-    public DateTime? RevokedOn { get; } = default;
-    public string? RevokedBy { get; } = default;
+    public DateTime? Birthday { get; private set; }
+    public bool Admin { get; private set; }
+    public DateTime CreatedOn { get; private set; }
+    public string CreatedBy { get; private set; }
+    public DateTime ModifiedOn { get; private set; }
+    public string ModifiedBy { get; private set; }
+    public DateTime? RevokedOn { get; private set; } = default;
+    public string? RevokedBy { get; private set; } = default;
 }

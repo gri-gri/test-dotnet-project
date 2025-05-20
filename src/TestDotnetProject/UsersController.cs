@@ -6,9 +6,18 @@ namespace TestDotnetProject;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    [HttpPost]
-    public IActionResult Create()
+    private readonly UsersRepository usersRepository;
+
+    public UsersController(UsersRepository usersRepository) : base()
     {
+        this.usersRepository = usersRepository;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create()
+    {
+        await usersRepository.CreateAsync();
+
         return Created();
     }
 }

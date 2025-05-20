@@ -16,14 +16,7 @@ public class UsersRepository
 
     public async Task<Guid> CreateAsync(CreateUserDto dto)
     {
-        var existingUserWithSameLogin = await usersDbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(user => user.Login == dto.Login);
-
-        if (existingUserWithSameLogin is not null)
-        {
-            throw LoginIsNotUniqueRepositoryException.FromLogin(dto.Login);
-        }
+        await CheckLoginUnique(dto.Login);
 
         var user = new User(dto.Login, dto.Password, dto.Name, dto.Gender, dto.Birthday, dto.IsAdmin, dto.CreatorLogin);
 
@@ -36,8 +29,7 @@ public class UsersRepository
 
     public async Task ChangeInfoAsync(Guid guid, string name, int gender, DateTime? birthday, string modifierLogin)
     {
-        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Guid == guid)
-            ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
+        var user = await FindAsync(guid);
 
         user.ChangeName(name, modifierLogin);
         user.ChangeGender(gender, modifierLogin);
@@ -48,8 +40,7 @@ public class UsersRepository
 
     public async Task ChangePasswordAsync(Guid guid, string password, string modifierLogin)
     {
-        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Guid == guid)
-            ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
+        var user = await FindAsync(guid);
 
         user.ChangePassword(password, modifierLogin);
 
@@ -58,28 +49,18 @@ public class UsersRepository
 
     public async Task ChangeLoginAsync(Guid guid, string login, string modifierLogin)
     {
-        var existingUserWithSameLogin = await usersDbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(user => user.Login == login);
+        await CheckLoginUnique(login);
 
-        if (existingUserWithSameLogin is not null)
-        {
-            throw LoginIsNotUniqueRepositoryException.FromLogin(login);
-        }
-
-        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Guid == guid)
-            ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
+        var user = await FindAsync(guid);
 
         user.ChangeLogin(login, modifierLogin);
 
         await usersDbContext.SaveChangesAsync();
     }
 
-    public async Task<User> FindUserAsync(Guid guid)
+    public async Task<User> FindAsync(Guid guid)
     {
-        return await usersDbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(user => user.Guid == guid)
+        return await usersDbContext.Users.FirstOrDefaultAsync(user => user.Guid == guid)
             ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
     }
 
@@ -113,8 +94,7 @@ public class UsersRepository
 
     public async Task DeleteAsync(string login)
     {
-        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login)
-            ?? throw UserNotFoundException.FromAnyStringId(login);
+        var user = await FindByLoginAsync(login);
 
         usersDbContext.Users.Remove(user);
 
@@ -123,8 +103,7 @@ public class UsersRepository
 
     public async Task RevokeAsync(string login, string revokerLogin)
     {
-        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login)
-            ?? throw UserNotFoundException.FromAnyStringId(login);
+        var user = await FindByLoginAsync(login);
 
         user.Revoke(revokerLogin);
 
@@ -133,11 +112,26 @@ public class UsersRepository
 
     public async Task ReviveAsync(Guid guid, string reviverLogin)
     {
-        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Guid == guid)
-            ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
+        var user = await FindAsync(guid);
 
         user.Revive(reviverLogin);
 
         await usersDbContext.SaveChangesAsync();
+    }
+
+    private async Task<User> FindByLoginAsync(string login)
+    {
+        return await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login)
+            ?? throw UserNotFoundException.FromAnyStringId(login);
+    }
+
+    private async Task CheckLoginUnique(string login)
+    {
+        var user = await GetByLoginAsync(login);
+
+        if (user is not null)
+        {
+            throw LoginIsNotUniqueException.FromLogin(login);
+        }
     }
 }

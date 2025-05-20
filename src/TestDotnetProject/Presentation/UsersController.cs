@@ -43,8 +43,21 @@ public class UsersController : ControllerBase
         var repositoryDto = new CreateUserDto(
             dto.Login, dto.Password, dto.Name, dto.Gender, dto.Birthday, dto.IsAdmin, "defaultAdmin");
 
-        var userGuid = await usersRepository.CreateAsync(repositoryDto);
+        try
+        {
+            var userGuid = await usersRepository.CreateAsync(repositoryDto);
 
-        return userGuid;
+            return userGuid;
+        }
+        catch (LoginIsNotUniqueRepositoryException ex)
+        {
+            return BadRequest($"Login '{ex.Login}' is not unique");
+        }
+    }
+
+    [HttpGet("active")]
+    public async Task<ActionResult<List<User>>> GetActiveUsers()
+    {
+        return await usersRepository.GetActiveUsers();
     }
 }

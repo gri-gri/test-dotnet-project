@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using TestDotnetProject.Domain;
 
 namespace TestDotnetProject.Application;
@@ -13,12 +14,27 @@ public class UsersRepository
 
     public async Task<Guid> CreateAsync(CreateUserDto dto)
     {
+        var existingUserWithSameLogin = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == dto.Login);
+
+        if (existingUserWithSameLogin is not null)
+        {
+            throw new LoginIsNotUniqueRepositoryException("Login is not unique", dto.Login);
+        }
+
         var user = new User(dto.Login, dto.Password, dto.Name, dto.Gender, dto.Birthday, dto.IsAdmin, dto.CreatorLogin);
 
-        usersDbContext.Add(user);
+        usersDbContext.Users.Add(user);
 
         await usersDbContext.SaveChangesAsync();
 
         return user.Guid;
+    }
+
+    public async Task<List<User>> GetActiveUsers()
+    {
+        return await usersDbContext.Users
+            .Where(user => user.RevokedOn == default)
+            .OrderBy(user => user.CreatedOn)
+            .ToListAsync();
     }
 }

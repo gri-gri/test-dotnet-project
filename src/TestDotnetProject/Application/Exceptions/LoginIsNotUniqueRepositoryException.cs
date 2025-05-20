@@ -1,4 +1,4 @@
-namespace TestDotnetProject.Application;
+namespace TestDotnetProject.Application.Exceptions;
 
 public class LoginIsNotUniqueRepositoryException : Exception
 {

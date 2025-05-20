@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TestDotnetProject.Application;
+using TestDotnetProject.Application.Dtos;
+using TestDotnetProject.Application.Exceptions;
 using TestDotnetProject.Domain;
+using TestDotnetProject.Domain.Helpers;
+using TestDotnetProject.Presentation.Dtos;
 
 namespace TestDotnetProject.Presentation;
 

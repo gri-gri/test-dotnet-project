@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using TestDotnetProject.Application.Dtos;
+using TestDotnetProject.Application.Exceptions;
 using TestDotnetProject.Domain;
 
 namespace TestDotnetProject.Application;

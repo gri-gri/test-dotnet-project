@@ -1,3 +1,5 @@
+using TestDotnetProject.Domain.Helpers;
+
 namespace TestDotnetProject.Domain;
 
 public class User

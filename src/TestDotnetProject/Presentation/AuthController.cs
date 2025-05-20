@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using TestDotnetProject.Application;
+using TestDotnetProject.Presentation.Dtos;
 
 namespace TestDotnetProject.Presentation;
 

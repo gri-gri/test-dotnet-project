@@ -29,7 +29,7 @@ builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<UsersDbContext>(options => options.UseNpgsql(
-    "Host=db;Port=5432;Database=app;Username=admin;Password=admin"));
+    Environment.GetEnvironmentVariable("NPGSQL_CONNECTION_STRING")));
 
 builder.Services.AddScoped<UsersRepository, UsersRepository>();
 
@@ -52,10 +52,30 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<UsersDbContext>();
-    await db.Database.EnsureDeletedAsync();
-    await db.Database.EnsureCreatedAsync();
-    db.Users.Add(new User("admin", "admin", "Me", 1, null, true, "system"));
-    await db.SaveChangesAsync();
+    await db.Database.MigrateAsync();
+
+    var adminUserLogin = Environment.GetEnvironmentVariable("ADMIN_USER_LOGIN")
+        ?? throw new InvalidOperationException("Environment variable 'ADMIN_USER_LOGIN' must be set");
+
+    var adminUser = await db.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Login == adminUserLogin);
+
+    if (adminUser is null)
+    {
+        var adminUserPassword = Environment.GetEnvironmentVariable("ADMIN_USER_PASSWORD")
+            ?? throw new InvalidOperationException("Environment variable 'ADMIN_USER_PASSWORD' must be set");
+
+        db.Users.Add(new User(
+            adminUserLogin,
+            adminUserPassword,
+            "SystemAdmin",
+            2,
+            null,
+            true,
+            "SystemAdmin"));
+        
+        await db.SaveChangesAsync();
+    }
+                    
 }
 
 if (app.Environment.IsDevelopment())

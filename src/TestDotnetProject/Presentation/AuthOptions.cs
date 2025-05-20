@@ -7,7 +7,8 @@ public static class AuthOptions
 {
     public const string ISSUER = "MyAuthServer";
     public const string AUDIENCE = "MyAuthClient";
-    public const string KEY = ";alsdfjk;lasdjkf;laskdjnvwaeoi32090j9slkanvlfjp9ejpo";
+    public static readonly string KEY = Environment.GetEnvironmentVariable("JWT_SECRET")
+        ?? throw new InvalidOperationException("Environment variable 'JWT_SECRET' must be set");
     public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
         new(Encoding.UTF8.GetBytes(KEY));
 }

@@ -5,6 +5,10 @@ services:
       - 8080:8080
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - NPGSQL_CONNECTION_STRING=Host=db;Port=5432;Database=app;Username=admin;Password=admin
+      - ADMIN_USER_LOGIN=${ADMIN_USER_LOGIN}
+      - ADMIN_USER_PASSWORD=${ADMIN_USER_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       db:
         condition: service_healthy

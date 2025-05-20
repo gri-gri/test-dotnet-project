@@ -27,13 +27,11 @@ public class AuthController : ControllerBase
         {
             return Unauthorized();
         }
-
-        var claims = new List<Claim> { new ("Guid", user.Guid.ToString()) };
         
         var jwt = new JwtSecurityToken(
             issuer: AuthOptions.ISSUER,
             audience: AuthOptions.AUDIENCE,
-            claims: claims,
+            claims: new List<Claim> { new ("Guid", user.Guid.ToString()) },
             expires: DateTime.UtcNow.AddHours(1),
             signingCredentials:
                 new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));

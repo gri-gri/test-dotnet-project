@@ -24,8 +24,7 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Guid>> CreateAsync([FromBody] CreateUserRequestDto dto)
     {
-        var user = await usersRepository.FindAsync(
-            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
+        var user = await GetCurrentUser();
 
         if (!user.Admin)
         {
@@ -33,9 +32,9 @@ public class UsersController : ControllerBase
         }
 
         if (!dto.Login.IsAlphaNumeric())
-            {
-                return BadRequest($"Parameter {nameof(dto.Login)} with value '{dto.Login}' is not alphanumeric");
-            }
+        {
+            return BadRequest($"Parameter {nameof(dto.Login)} with value '{dto.Login}' is not alphanumeric");
+        }
 
         if (!dto.Password.IsAlphaNumeric())
         {
@@ -72,8 +71,7 @@ public class UsersController : ControllerBase
     [HttpPut("{guid:guid}/info")]
     public async Task<ActionResult> ChangeInfoAsync([FromRoute] Guid guid, [FromBody] ChangeInfoRequestDto dto)
     {
-        var user = await usersRepository.FindAsync(
-            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
+        var user = await GetCurrentUser();
 
         if (!(user.Admin || (user.Guid == guid && user.RevokedOn == default)))
         {
@@ -107,8 +105,7 @@ public class UsersController : ControllerBase
     [HttpPut("{guid:guid}/password")]
     public async Task<ActionResult> ChangePasswordAsync([FromRoute] Guid guid, [FromBody] ChangePasswordRequestDto dto)
     {
-        var user = await usersRepository.FindAsync(
-            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
+        var user = await GetCurrentUser();
 
         if (!(user.Admin || (user.Guid == guid && user.RevokedOn == default)))
         {
@@ -135,8 +132,7 @@ public class UsersController : ControllerBase
     [HttpPut("{guid:guid}/login")]
     public async Task<ActionResult> ChangeLoginAsync([FromRoute] Guid guid, [FromBody] ChangeLoginRequestDto dto)
     {
-        var user = await usersRepository.FindAsync(
-            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
+        var user = await GetCurrentUser();
 
         if (!(user.Admin || (user.Guid == guid && user.RevokedOn == default)))
         {
@@ -168,8 +164,7 @@ public class UsersController : ControllerBase
     // Here and after returning full user is bad, but anything other is not specified
     public async Task<ActionResult<List<User>>> GetActiveAsync()
     {
-        var user = await usersRepository.FindAsync(
-            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
+        var user = await GetCurrentUser();
 
         if (!user.Admin)
         {
@@ -182,8 +177,7 @@ public class UsersController : ControllerBase
     [HttpGet("{login}")]
     public async Task<ActionResult<GetUserBriefResponseDto>> GetByLoginAsync([FromRoute] string login)
     {
-        var user = await usersRepository.FindAsync(
-            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
+        var user = await GetCurrentUser();
 
         if (!user.Admin)
         {
@@ -205,8 +199,7 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<User>> GetByLoginAndPasswordAsync(
         [FromRoute] string login, [FromRoute] string password)
     {
-        var user = await usersRepository.FindAsync(
-            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
+        var user = await GetCurrentUser();
 
         if (user.Login != login)
         {
@@ -224,8 +217,7 @@ public class UsersController : ControllerBase
     [HttpGet("seniors")]
     public async Task<ActionResult<List<User>>> GetSeniorsAsync([FromQuery] int olderThanYears)
     {
-        var user = await usersRepository.FindAsync(
-            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
+        var user = await GetCurrentUser();
 
         if (!user.Admin)
         {
@@ -243,8 +235,7 @@ public class UsersController : ControllerBase
     [HttpDelete("{login}")]
     public async Task<ActionResult> DeleteAsync([FromRoute] string login, [FromQuery] bool softDeletion)
     {
-        var user = await usersRepository.FindAsync(
-            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
+        var user = await GetCurrentUser();
 
         if (!user.Admin)
         {
@@ -273,8 +264,7 @@ public class UsersController : ControllerBase
     [HttpPut("{guid:guid}/revoked-status")]
     public async Task<ActionResult> ReviveAsync([FromRoute] Guid guid, [FromBody] ReviveRequestDto dto)
     {
-        var user = await usersRepository.FindAsync(
-            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
+        var user = await GetCurrentUser();
 
         if (!user.Admin)
         {
@@ -298,6 +288,11 @@ public class UsersController : ControllerBase
         {
             return NotFound($"User with guid '{ex.Id}' was not found");
         }
+    }
 
+    private async Task<User> GetCurrentUser()
+    {
+        return await usersRepository.FindAsync(
+            Guid.Parse(HttpContext.User.Claims.First(claim => claim.Type == "Guid").Value));
     }
 }

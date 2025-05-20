@@ -87,4 +87,15 @@ public class UsersController : ControllerBase
 
         return user;
     }
+
+    [HttpGet("seniors")]
+    public async Task<ActionResult<List<User>>> GetSeniors([FromQuery] int olderThanYears)
+    {
+        if (olderThanYears < 1)
+        {
+            return BadRequest($"Parameter {nameof(olderThanYears)} must be positive integer, not '{olderThanYears}'");
+        }
+
+        return await usersRepository.GetOlderThanYearsAsync(olderThanYears);
+    }
 }

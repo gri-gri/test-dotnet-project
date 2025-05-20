@@ -47,4 +47,11 @@ public class UsersRepository
     {
         return await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == login && user.Password == password);
     }
+
+    public async Task<List<User>> GetOlderThanYearsAsync(int years)
+    {
+        var latestBirthdate = DateTime.UtcNow.AddYears(-years);
+
+        return await usersDbContext.Users.Where(user => user.Birthday < latestBirthdate).ToListAsync();
+    }
 }

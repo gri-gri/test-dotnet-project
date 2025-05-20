@@ -15,6 +15,7 @@ public class UsersDbContext : DbContext
             .HasKey(user => user.Guid);
 
         modelBuilder.Entity<User>()
-            .HasAlternateKey(user => user.Login);
+            .HasIndex(user => user.Login)
+            .IsUnique(true);
     }
 }

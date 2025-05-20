@@ -14,7 +14,9 @@ public class UsersRepository
 
     public async Task<Guid> CreateAsync(CreateUserDto dto)
     {
-        var existingUserWithSameLogin = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Login == dto.Login);
+        var existingUserWithSameLogin = await usersDbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Login == dto.Login);
 
         if (existingUserWithSameLogin is not null)
         {
@@ -48,6 +50,25 @@ public class UsersRepository
             ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
 
         user.ChangePassword(password, modifierLogin);
+
+        await usersDbContext.SaveChangesAsync();
+    }
+
+    public async Task ChangeLoginAsync(Guid guid, string login, string modifierLogin)
+    {
+        var existingUserWithSameLogin = await usersDbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(user => user.Login == login);
+
+        if (existingUserWithSameLogin is not null)
+        {
+            throw LoginIsNotUniqueRepositoryException.FromLogin(login);
+        }
+
+        var user = await usersDbContext.Users.FirstOrDefaultAsync(user => user.Guid == guid)
+            ?? throw UserNotFoundException.FromAnyStringId(guid.ToString());
+
+        user.ChangeLogin(login, modifierLogin);
 
         await usersDbContext.SaveChangesAsync();
     }

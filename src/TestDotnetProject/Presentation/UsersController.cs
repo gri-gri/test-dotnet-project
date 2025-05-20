@@ -76,7 +76,7 @@ public class UsersController : ControllerBase
         }
         catch (UserNotFoundException ex)
         {
-            return NotFound($"User with login '{ex.Id}' was not found");
+            return NotFound($"User with guid '{ex.Id}' was not found");
         }
 
         return Ok();
@@ -96,7 +96,31 @@ public class UsersController : ControllerBase
         }
         catch (UserNotFoundException ex)
         {
-            return NotFound($"User with login '{ex.Id}' was not found");
+            return NotFound($"User with guid '{ex.Id}' was not found");
+        }
+
+        return Ok();
+    }
+
+    [HttpPut("{guid:guid}/login")]
+    public async Task<ActionResult> ChangeLoginAsync([FromRoute] Guid guid, [FromBody] ChangeLoginRequestDto dto)
+    {
+        if (!dto.Login.IsAlphaNumeric())
+        {
+            return BadRequest($"Parameter {nameof(dto.Login)} with value '{dto.Login}' is not alphanumeric");
+        }
+
+        try
+        {
+            await usersRepository.ChangeLoginAsync(guid, dto.Login, "defaultAdmin");
+        }
+        catch (LoginIsNotUniqueRepositoryException ex)
+        {
+            return BadRequest($"Login '{ex.Login}' is not unique");
+        }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound($"User with guid '{ex.Id}' was not found");
         }
 
         return Ok();
@@ -122,7 +146,7 @@ public class UsersController : ControllerBase
         return new GetUserBriefResponseDto(user.Name, user.Gender, user.Birthday, user.RevokedOn == default);
     }
 
-    [HttpGet("{login}/password/{password}")] // Very bad decision, but the task is so
+    [HttpGet("{login}/password/{password}")] // Very bad decision, but the task requires
     public async Task<ActionResult<User>> GetByLoginAndPasswordAsync(
         [FromRoute] string login, [FromRoute] string password)
     {
@@ -187,7 +211,7 @@ public class UsersController : ControllerBase
         }
         catch (UserNotFoundException ex)
         {
-            return NotFound($"User with login '{ex.Id}' was not found");
+            return NotFound($"User with guid '{ex.Id}' was not found");
         }
 
     }
